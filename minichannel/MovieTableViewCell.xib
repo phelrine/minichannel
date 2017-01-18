@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="567" id="KGk-i7-Jjw" customClass="MovieTableViewCell" customModule="minichannel" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="413" height="416"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="413" height="415.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WRf-kq-Vlu">
+                        <rect key="frame" x="46.5" y="18" width="320" height="320"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="320" id="MiH-U1-w9L"/>
+                            <constraint firstAttribute="height" constant="320" id="xJC-Jo-2gU"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Tr-SI-X5b">
+                        <rect key="frame" x="185.5" y="346" width="42" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="8IS-dw-3wm"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="WRf-kq-Vlu" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="10" id="0FA-gt-XJf"/>
+                    <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="8Tr-SI-X5b" secondAttribute="bottom" id="EsB-y6-gIy"/>
+                    <constraint firstItem="8Tr-SI-X5b" firstAttribute="centerX" secondItem="WRf-kq-Vlu" secondAttribute="centerX" id="EyK-Ga-Csd"/>
+                    <constraint firstItem="8Tr-SI-X5b" firstAttribute="top" secondItem="WRf-kq-Vlu" secondAttribute="bottom" constant="8" id="V6u-Xf-5RV"/>
+                    <constraint firstItem="WRf-kq-Vlu" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="bJA-CX-DQO"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="nameLabel" destination="8Tr-SI-X5b" id="o0X-eJ-XT7"/>
+                <outlet property="thumbnailView" destination="WRf-kq-Vlu" id="U18-RA-FYg"/>
+            </connections>
+            <point key="canvasLocation" x="126.5" y="216"/>
+        </tableViewCell>
+    </objects>
+</document>
