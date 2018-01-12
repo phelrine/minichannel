@@ -16,6 +16,7 @@ class MoviePlayerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        self.view.backgroundColor = .black
     }
 
     override func didReceiveMemoryWarning() {
@@ -24,16 +25,17 @@ class MoviePlayerViewController: UIViewController {
     }
 
     override func viewDidLayoutSubviews() {
-        controller?.view.frame = CGRect(x: 0, y: self.topLayoutGuide.length, width: self.view.bounds.size.width, height: self.view.bounds.size.width);
         super.viewDidLayoutSubviews()
+        controller?.view.frame = CGRect(x: 0, y: self.topLayoutGuide.length, width: self.view.bounds.size.width, height: self.view.bounds.size.width);
     }
 
     func loadMovie(_ url: URL) {
         let player = AVPlayer(url: url)
-        controller = AVPlayerViewController()
-        controller?.player = player
-        self.addChildViewController(controller!)
-        self.view.addSubview(controller!.view)
+        let controller = AVPlayerViewController()
+        controller.player = player
+        self.controller = controller
+        self.addChildViewController(controller)
+        self.view.addSubview(controller.view)
         player.play()
     }
 

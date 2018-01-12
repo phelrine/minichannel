@@ -13,31 +13,11 @@ import FirebaseStorage
 import FirebaseDatabase
 import AVFoundation
 import AVKit
-import ObjectMapper
-
-class MovieInfo: Mappable {
-    var uid: String?
-    var userName: String?
-    var moviePath: String?
-    var thumbnailPath: String?
-
-    /// This function can be used to validate JSON prior to mapping. Return nil to cancel mapping at this point
-    public required init?(map: Map) {
-        uid <- map["uid"]
-        userName <- map["user_name"]
-        moviePath <- map["movie_path"]
-        thumbnailPath <- map["thumbnail_path"]
-    }
-
-    /// This function is where all variable mappings should occur. It is executed by Mapper during the mapping (serialization and deserialization) process.
-    public func mapping(map: Map) {
-    }
-}
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     @IBOutlet var movieTableView: UITableView?
 
-    let databaseRef = FIRDatabase.database().reference()
+    let databaseRef = Database.database().reference()
     let refreshControl = UIRefreshControl()
     var movies = [MovieInfo]()
     var playMovie: MovieInfo?
@@ -58,9 +38,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         navigationItem.titleView = UIImageView(image: UIImage(named: "TitleLogo"))
     }
 
-    func reload(_ sender: Any?) {
+    @objc func reload(_ sender: Any?) {
         databaseRef.child("movies").queryLimited(toLast: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-            let movies = snapshot.children.flatMap{ ($0 as? FIRDataSnapshot)?.value as? [String: Any] }.flatMap{ MovieInfo(JSON: $0) }
+            let movies = snapshot.children.flatMap{ ($0 as? DataSnapshot)?.value as? [String: Any] }.flatMap{ MovieInfo(JSON: $0) }
             self.movies = movies.reversed()
             DispatchQueue.main.async {
                 self.movieTableView?.reloadData()
@@ -77,7 +57,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
 
     @IBAction func postButtonDidTouch(sender: UIButton) {
-        print("tapped")
         let vc = UIImagePickerController()
         vc.sourceType = .photoLibrary
         vc.mediaTypes = [kUTTypeMovie as String]
@@ -92,14 +71,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             let time = CMTimeMakeWithSeconds(asset.duration.seconds / 2, 30)
             if let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil), let thumbnailData = UIImageJPEGRepresentation(UIImage(cgImage: cgImage), 1) {
 
-                let storageRef = FIRStorage.storage().reference()
+                let storageRef = Storage.storage().reference()
                 let moviePath = "movies/\(NSUUID().uuidString).MOV"
                 let movieRef = storageRef.child(moviePath)
-                movieRef.putFile(url, metadata: nil) { (metadata, error) in
+                movieRef.putFile(from: url, metadata: nil) { (metadata, error) in
                     let thumbnailPath = "thumbnail/\(NSUUID().uuidString).jpg"
                     let thumbnailRef = storageRef.child(thumbnailPath)
-                    thumbnailRef.put(thumbnailData, metadata: nil) { (thumbnailMetadata, error) in
-                        if let user = FIRAuth.auth()?.currentUser, error == nil {
+                    thumbnailRef.putData(thumbnailData, metadata: nil) { (thumbnailMetadata, error) in
+                        if let user = Auth.auth().currentUser, error == nil {
                             let uid = user.uid
                             var movieData = [
                                 "uid": uid,
@@ -109,7 +88,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                             if let userName = user.displayName {
                                 movieData["user_name"] = userName
                             }
-                            let databaseRef = FIRDatabase.database().reference()
+                            let databaseRef = Database.database().reference()
                             let moviesRef = databaseRef.child("movies")
                             let key = moviesRef.childByAutoId().key
                             moviesRef.child(key).setValue(movieData)
@@ -126,7 +105,7 @@ extension ViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return movies.count
     }
@@ -137,8 +116,8 @@ extension ViewController: UITableViewDataSource {
             let movie = movies[indexPath.row]
             movieCell.nameLabel.text = movie.userName
             if let thumbnailPath = movie.thumbnailPath {
-                let storageRef = FIRStorage.storage().reference()
-                storageRef.child(thumbnailPath).data(withMaxSize: 1024 * 1024 * 5) { (data, error) in
+                let storageRef = Storage.storage().reference()
+                storageRef.child(thumbnailPath).getData(maxSize: 1024 * 1024 * 5) { (data, error) in
                     if error != nil {
                         return
                     }
@@ -161,7 +140,7 @@ extension ViewController: UITableViewDelegate {
         playMovie = movie
         let playerViewController = MoviePlayerViewController()
         if let moviePath = self.playMovie?.moviePath {
-            let storageRef = FIRStorage.storage().reference()
+            let storageRef = Storage.storage().reference()
             storageRef.child(moviePath).downloadURL{ (url, error) in
                 guard error == nil, let url = url else {
                     return

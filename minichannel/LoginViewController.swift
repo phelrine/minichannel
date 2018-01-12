@@ -18,8 +18,8 @@ class LoginViewController: UIViewController, GIDSignInUIDelegate {
         // Do any additional setup after loading the view.
 
         GIDSignIn.sharedInstance().uiDelegate = self
-        // try? FIRAuth.auth()?.signOut()
-        FIRAuth.auth()?.addStateDidChangeListener { auth, user in
+        // try? Auth.auth().signOut()
+        Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
                 self.performSegue(withIdentifier: "MainViewSegue", sender: nil)
             }
