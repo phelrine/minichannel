@@ -65,37 +65,38 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let url = info[UIImagePickerControllerMediaURL] as? URL {
-            let asset = AVURLAsset(url: url)
-            let imageGenerator = AVAssetImageGenerator(asset: asset)
-            let time = CMTimeMakeWithSeconds(asset.duration.seconds / 2, 30)
-            if let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil), let thumbnailData = UIImageJPEGRepresentation(UIImage(cgImage: cgImage), 1) {
-
-                let storageRef = Storage.storage().reference()
-                let moviePath = "movies/\(NSUUID().uuidString).MOV"
-                let movieRef = storageRef.child(moviePath)
-                movieRef.putFile(from: url, metadata: nil) { (metadata, error) in
-                    let thumbnailPath = "thumbnail/\(NSUUID().uuidString).jpg"
-                    let thumbnailRef = storageRef.child(thumbnailPath)
-                    thumbnailRef.putData(thumbnailData, metadata: nil) { (thumbnailMetadata, error) in
-                        if let user = Auth.auth().currentUser, error == nil {
-                            let uid = user.uid
-                            var movieData = [
-                                "uid": uid,
-                                "movie_path": moviePath,
-                                "thumbnail_path": thumbnailPath
-                            ]
-                            if let userName = user.displayName {
-                                movieData["user_name"] = userName
-                            }
-                            let databaseRef = Database.database().reference()
-                            let moviesRef = databaseRef.child("movies")
-                            let key = moviesRef.childByAutoId().key
-                            moviesRef.child(key).setValue(movieData)
-                        }
-                        picker.dismiss(animated: true, completion: nil)
+        guard let url = info[UIImagePickerControllerMediaURL] as? URL else {
+            return
+        }
+        let asset = AVURLAsset(url: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        let time = CMTimeMakeWithSeconds(asset.duration.seconds / 2, 30)
+        guard let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil), let thumbnailData = UIImageJPEGRepresentation(UIImage(cgImage: cgImage), 1) else {
+            return
+        }
+        let storageRef = Storage.storage().reference()
+        let moviePath = "movies/\(NSUUID().uuidString).MOV"
+        let movieRef = storageRef.child(moviePath)
+        movieRef.putFile(from: url, metadata: nil) { (metadata, error) in
+            let thumbnailPath = "thumbnail/\(NSUUID().uuidString).jpg"
+            let thumbnailRef = storageRef.child(thumbnailPath)
+            thumbnailRef.putData(thumbnailData, metadata: nil) { (thumbnailMetadata, error) in
+                if let user = Auth.auth().currentUser, error == nil {
+                    let uid = user.uid
+                    var movieData = [
+                        "uid": uid,
+                        "movie_path": moviePath,
+                        "thumbnail_path": thumbnailPath
+                    ]
+                    if let userName = user.displayName {
+                        movieData["user_name"] = userName
                     }
+                    let databaseRef = Database.database().reference()
+                    let moviesRef = databaseRef.child("movies")
+                    let key = moviesRef.childByAutoId().key
+                    moviesRef.child(key).setValue(movieData)
                 }
+                picker.dismiss(animated: true, completion: nil)
             }
         }
     }
