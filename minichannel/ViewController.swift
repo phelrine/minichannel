@@ -74,31 +74,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         guard let cgImage = try? imageGenerator.copyCGImage(at: time, actualTime: nil), let thumbnailData = UIImageJPEGRepresentation(UIImage(cgImage: cgImage), 1) else {
             return
         }
-        let storageRef = Storage.storage().reference()
-        let moviePath = "movies/\(NSUUID().uuidString).MOV"
-        let movieRef = storageRef.child(moviePath)
-        movieRef.putFile(from: url, metadata: nil) { (metadata, error) in
-            let thumbnailPath = "thumbnail/\(NSUUID().uuidString).jpg"
-            let thumbnailRef = storageRef.child(thumbnailPath)
-            thumbnailRef.putData(thumbnailData, metadata: nil) { (thumbnailMetadata, error) in
-                if let user = Auth.auth().currentUser, error == nil {
-                    let uid = user.uid
-                    var movieData = [
-                        "uid": uid,
-                        "movie_path": moviePath,
-                        "thumbnail_path": thumbnailPath
-                    ]
-                    if let userName = user.displayName {
-                        movieData["user_name"] = userName
-                    }
-                    let databaseRef = Database.database().reference()
-                    let moviesRef = databaseRef.child("movies")
-                    let key = moviesRef.childByAutoId().key
-                    moviesRef.child(key).setValue(movieData)
-                }
-                picker.dismiss(animated: true, completion: nil)
-            }
-        }
+        // ファイルアップロード処理を書く
     }
 }
 
@@ -113,24 +89,7 @@ extension ViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
-        if let movieCell = cell as? MovieTableViewCell {
-            let movie = movies[indexPath.row]
-            movieCell.nameLabel.text = movie.userName
-            if let thumbnailPath = movie.thumbnailPath {
-                let storageRef = Storage.storage().reference()
-                storageRef.child(thumbnailPath).getData(maxSize: 1024 * 1024 * 5) { (data, error) in
-                    if error != nil {
-                        return
-                    }
-                    if let data = data, let image = UIImage(data: data, scale: 1) {
-                        DispatchQueue.main.async {
-                            movieCell.thumbnailView.image = image
-                            movieCell.setNeedsUpdateConstraints()
-                        }
-                    }
-                }
-            }
-        }
+        // セル表示処理を書く
         return cell
     }
 }
