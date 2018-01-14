@@ -1,3 +1,4 @@
+
 //
 //  LoginViewController.swift
 //  minichannel
@@ -18,12 +19,14 @@ class LoginViewController: UIViewController, GIDSignInUIDelegate {
         // Do any additional setup after loading the view.
 
         GIDSignIn.sharedInstance().uiDelegate = self
-        // try? Auth.auth().signOut()
-        Auth.auth().addStateDidChangeListener { auth, user in
-            if user != nil {
-                self.performSegue(withIdentifier: "MainViewSegue", sender: nil)
-            }
+        try? Auth.auth().signOut()
+        // ユーザーデータ確認
+        if let user = Auth.auth().currentUser, let name = user.displayName, let email = user.email {
+            print("\(name) \(email)")
+        } else {
+            print("no current user")
         }
+        // ここにログインした後の処理を書く
     }
 
     override func didReceiveMemoryWarning() {
